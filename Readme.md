@@ -26,7 +26,7 @@
 * processor运行自己的决策逻辑，最终输出操作指令给适配层执行。
 
 ### Schedule
-调度层根据游戏流程来编排Processor执行顺序，并处理各种意外情况，保证程序稳定运行。
+调度层根据游戏流程来编排Processor执行顺序，并处理各种意外情况，保证程序稳定正确运行。
 
 ### UI
 ui提供图形化的用户操作界面，可以修改配置并启动或关闭程序。
@@ -35,7 +35,33 @@ ui提供图形化的用户操作界面，可以修改配置并启动或关闭程
 程序运行时依赖的配置项，可通过UI让用户修改。
 
 ## 调度过程
-如果游戏流程比较复杂且不稳定，线性调度编程会复杂并难以维护。采用类似状态机的状态流转式调度实现会更加清晰并具有较高的稳定性保证。
+如果游戏流程比较复杂且不稳定，线性调度编程会复杂并难以维护。采用类似状态机的状态流转实现调度过程，逻辑会更加清晰，并具有较高的稳定性保证。
+以简单的贪吃蛇游戏举例来说，打开游戏后的主界面有个开始按钮，点击开始后就进入游戏画面，玩家上下左右控制方向，失败后会弹出一个游戏结束确认按钮，点击后会回到主界面。
+
+线性实现流程代码可能是这样：
+```python
+while True:
+    if is_waiting_start(context):
+        click_start()
+        if is_gaming(context):
+            game_process()
+            if end_confirm(context):
+                click_end()
+
+```
+可以定义三种状态：等待开始，游戏中，结束确认。
+用状态流转实现可以简化成下面这样
+```python
+states = ["waiting_start","gaming","waiting_end"]
+while True:
+    for state in states:
+        processor = Processor.get(state)
+        if processor.run(): # state匹配成功并执行完成
+            update_states(processor.next_states()) # 将当前state结束后可能出现的state更新到最前
+            break
+
+
+```
 
 ![img.png](static/docs/schedule.png)
 
