@@ -1,9 +1,8 @@
 # Python学习实践-简单游戏自动化脚本的实现
-以Warcraft Rumble游戏为例
 
 ## 基本框架
 
-![img.png](static/docs/framework.png)
+![framework](static/docs/framework.png)
 
 
 ### Adaptor
@@ -38,10 +37,10 @@ ui提供图形化的用户操作界面，可以修改配置并启动或关闭程
 如果游戏流程比较复杂且不稳定，线性调度编程会复杂并难以维护。采用类似状态机的状态流转实现调度过程，逻辑会更加清晰，并具有较高的稳定性保证。
 以简单的贪吃蛇游戏举例来说，打开游戏后的主界面有个开始按钮，点击开始后就进入游戏画面，玩家上下左右控制方向，失败后会弹出一个游戏结束确认按钮，点击后会回到主界面。
 
-线性实现流程代码可能是这样：
+线性实现流程代码可能是这样:
 ```python
 while True:
-    if is_waiting_start(context):
+    if is_waiting_start():
         click_start()
         if is_gaming(context):
             game_process()
@@ -50,7 +49,7 @@ while True:
 
 ```
 可以定义三种状态：等待开始，游戏中，结束确认。
-用状态流转实现可以简化成下面这样
+用状态流转实现可以简化成下面这样:
 ```python
 states = ["waiting_start","gaming","waiting_end"]
 while True:
@@ -63,7 +62,7 @@ while True:
 
 ```
 
-![img.png](static/docs/schedule.png)
+![schedule](static/docs/schedule.png)
 
 
 ## 主要使用的仓库
