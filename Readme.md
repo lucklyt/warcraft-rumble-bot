@@ -86,3 +86,5 @@ while True:
 * [pyinstaller](https://github.com/pyinstaller/pyinstaller) 将Python脚本构建成应用程序，支持多平台。
 * [pyyaml](https://github.com/yaml/pyyaml) Python读写yaml配置文件。
 
+## 魔兽自作战
+[夸克](https://pan.quark.cn/s/8ce3bf8ce212)
