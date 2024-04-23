@@ -87,4 +87,5 @@ while True:
 * [pyyaml](https://github.com/yaml/pyyaml) Python读写yaml配置文件。
 
 ## 魔兽自作战
-[夸克](https://pan.quark.cn/s/8ce3bf8ce212)
+只支持简体中文
+[下载地址](https://ifjodcbgxo.feishu.cn/docx/ANvjdlP3RoyQdSxyhCQcY3k2nsc)
