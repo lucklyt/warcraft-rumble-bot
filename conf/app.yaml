@@ -1,0 +1,106 @@
+adb:
+  app_activity: com.blizzard.arc/com.blizzard.gryphon.unity.player.GryphonUnityPlayerActivity
+  app_package: com.blizzard.arc
+  port: 5555
+auth:
+  password: 6187737ceb025e4a219e32b7c6964fea
+  username: test
+emulator:
+  path: C:\Program Files\BlueStacks_nxt_cn\HD-Player.exe
+  pos_deviation: 8
+  slide_duration:
+  - 500
+  - 600
+  touch_delay: 30
+game_mode: pve
+kobold:
+  skin: 无
+line_up:
+- name: 老瞎眼
+  talent: 鱼人马拉松
+  order: 1
+- name: 憎恶
+  talent: 有害污染
+  order: 1
+- name: 侏儒飞行员
+  talent: 侏儒隐形装置
+  order: 2
+- name: 野猪人
+  talent: 棘背
+  order: 2
+- name: 狮鹫骑士
+  talent: 强力投掷
+  order: 3
+- name: 霜狼萨满祭司
+  talent: 大地之盾
+  order: 2
+- name: 迪菲亚劫掠者
+  talent: 翻箱倒柜
+  order: 1
+log:
+  auto_delete_cache: true
+  capture_file_name: '%H_%M_%S'
+  level: DEBUG
+model:
+  cv_threshold: 0.9
+notify:
+  mail:
+    receiver:
+    code:
+placement_rounds:
+- default: true
+  seq: 3
+  traits:
+  - Unbound
+  - Siege Damage
+- seq: 2
+  traits:
+  - Ranged
+  - Flying
+- seq: 1
+  traits:
+  - Tank
+pve:
+  default:
+    placement_targets: null
+  refresh_task: true
+pvp:
+  Alterac:
+    init_op:
+    - slide (800,600) (540,600)
+    - slide (400,600) (400,950)
+    placement_targets: null
+  Arathi:
+    init_op:
+    - slide (800,600) (750,600)
+    - slide (400,600) (400,850)
+    - touch (50,970)
+    placement_targets: null
+  map: Arathi
+bond:
+- former: 凯恩·血蹄
+  latter: 霜狼萨满祭司
+  relation: 单向
+- former: 凯恩·血蹄
+  latter: 暗矛巨魔
+  relation: 单向
+- former: 火元素
+  latter: 霜狼萨满祭司
+  relation: 单向
+- former: 火元素
+  latter: 暗矛巨魔
+  relation: 单向
+- former: 达基萨斯将军
+  latter: 霜狼萨满祭司
+  relation: 单向
+- former: 达基萨斯将军
+  latter: 火焰之锤
+  relation: 单向
+- former: 火元素
+  latter: 火焰之锤
+  relation: 单向
+anonymous_team: false
+scheduled:
+  enabled: false
+  start_time: '22:30'
+  end_time: 08:00

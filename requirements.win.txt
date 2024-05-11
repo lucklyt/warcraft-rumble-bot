@@ -1,0 +1,13 @@
+cnocr
+adb-shell
+opencv-python
+py-machineid
+pyinstaller
+PyYAML
+setuptools
+dhash
+nicegui
+pywin32
+pywebview
+onnxruntime
+parse

@@ -1,0 +1,21 @@
+cache
+__pycache__
+.idea
+output
+platform-tools
+log
+dist
+build
+/warcraft-rumble.spec
+screen.png
+*.c
+*.pyd
+/conf/rsa
+/conf/rsa.pub
+./test.py
+/cv.cpython-39-darwin.so
+/warcraft-rumble 0.0.0.dmg
+/魔兽自作战.spec
+/魔兽自作战 0.0.0.dmg
+*.dmg
+/warcraft_rumble_bot.spec

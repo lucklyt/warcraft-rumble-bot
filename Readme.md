@@ -41,38 +41,6 @@ ui提供图形化的用户操作界面，可以修改配置并启动或关闭程
 
 程序运行时依赖的配置项，可通过UI让用户修改。
 
-## 调度过程
-
-如果游戏流程比较复杂且不稳定，线性调度编程会复杂并难以维护。采用类似状态机的状态流转实现调度过程，逻辑会更加清晰，并具有较高的稳定性保证。
-以简单的贪吃蛇游戏举例来说，打开游戏后的主界面有个开始按钮，点击开始后就进入游戏画面，玩家上下左右控制方向，失败后会弹出一个游戏结束确认按钮，点击后会回到主界面。
-
-线性实现流程代码可能是这样:
-
-```python
-while True:
-    if is_waiting_start():
-        click_start()
-        if is_gaming(context):
-            game_process()
-            if end_confirm(context):
-                click_end()
-```
-
-可以定义三种状态：等待开始，游戏中，结束确认。
-用状态流转实现可以简化成下面这样:
-
-```python
-states = ["waiting_start","gaming","waiting_end"]
-while True:
-    for state in states:
-        processor = Processor.get(state)
-        if processor.run(): # state匹配成功并执行完成
-            update_states(processor.next_states()) # 将当前state结束后可能出现的state更新到最前
-            break
-```
-
-
-![schedule](static/docs/schedule.png)
 
 ## 主要使用的仓库
 
@@ -86,6 +54,25 @@ while True:
 * [pyinstaller](https://github.com/pyinstaller/pyinstaller) 将Python脚本构建成应用程序，支持多平台。
 * [pyyaml](https://github.com/yaml/pyyaml) Python读写yaml配置文件。
 
-## 魔兽自作战
-只支持简体中文
-[下载地址](https://ifjodcbgxo.feishu.cn/docx/ANvjdlP3RoyQdSxyhCQcY3k2nsc)
+## 使用方法
+### 从源码编译
+需要安装Python3.12,运行ps脚本构建GUI应用。
+#### windows
+构建windows应用程序依赖MSVC工具集，提前[下载](https://visualstudio.microsoft.com/zh-hans/visual-cpp-build-tools/)安装。
+
+在项目根目录下运行以下命令编译构建:
+```shell
+pip install -r requirements.win.txt
+./py_to_exe.ps1
+```
+编译好的应用在dist目录下，运行warcraft_rumble_bot.exe即可启动。
+
+#### MacOS
+
+在项目根目录下运行以下命令编译构建:
+```shell
+brew install powershell/tap/powershell
+pip install -r requirements.darwin.txt
+pwsh ./py_to_exe.ps1
+```
+编译好的应用dmg安装包在当前目录下的warcraft_rumble_bot 0.0.0.dmg，打开拖动App图标到应用程序即可。
