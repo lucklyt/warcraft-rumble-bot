@@ -45,8 +45,8 @@ model:
   cv_threshold: 0.9
 notify:
   mail:
-    receiver:
-    code:
+    receiver: null
+    code: null
 placement_rounds:
 - default: true
   seq: 3
@@ -104,3 +104,4 @@ scheduled:
   enabled: false
   start_time: '22:30'
   end_time: 08:00
+platform: pc

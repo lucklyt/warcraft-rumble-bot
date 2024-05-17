@@ -13,9 +13,9 @@ from operator import attrgetter
 
 import detect.image_cv
 from conf import conf
-import warcraft, units
+from . import warcraft, units
 from process_control import energy
-from units import Unit, PlacementState, Trait
+from . units import Unit, PlacementState, Trait
 
 kobold = Unit.get_by_name("狗头人矿工")
 

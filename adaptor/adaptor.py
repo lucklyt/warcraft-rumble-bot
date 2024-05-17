@@ -23,12 +23,12 @@ base_height = 1920
 base_width = 1080
 
 
-def match_screen_size(img):
+def match_screen_size(img: Image.Image):
     if not img:
         return None
     global base_width
     global target_size, ratio
-    target_size = img.size()
+    target_size = img.size
     ratio = target_size[1] / base_height
     base_width = int(target_size[0] / ratio)
     return img.resize((base_width, base_height))

@@ -6,9 +6,9 @@ from enum import Enum
 
 from conf import conf
 from conf.conf import log
-import battle
+from . import battle
 from adaptor import adaptor
-import warcraft
+from . import warcraft
 
 last_battle_time = time.time()
 enter_battle = False

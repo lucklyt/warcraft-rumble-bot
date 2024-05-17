@@ -11,9 +11,9 @@ import pytz
 from PIL import Image
 
 import conf.conf as conf
-import units
+from . import units
 from adaptor import adaptor, emulator
-from units import Unit
+from .units import Unit
 from mail import mail
 
 source = Image.Image()

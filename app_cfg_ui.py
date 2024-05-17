@@ -160,6 +160,9 @@ with ui.card().tight().classes('w-full h-screen no-shadow p-0') as card:
 
                         # 模拟器配置
                         with ui.tab_panel(simulator_cfg):
+                            ui.label('运行平台')
+                            ui.radio({'emulator': '模拟器', 'pc': 'PC端'}, value=conf.get_platform(),
+                                     on_change=lambda e: conf.set_platform(e.value)).props('inline')
                             with ui.row().classes('w-full'):
                                 ui.number(label='模拟器端口号', value=conf.adb_port(), min=0, precision=0,
                                           format='%.0f',
