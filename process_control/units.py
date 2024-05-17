@@ -8,7 +8,8 @@ from enum import Enum
 from PIL import Image
 
 from conf import conf
-from adaptor import emulator
+from adaptor import emulator, adaptor
+from detect import image_cv
 
 unis_json = """
 
@@ -1251,11 +1252,8 @@ class Unit:
 
     def placement_state(self, img: Image.Image, ec: int):
         if self.anonymous:
-            if adb_helper.ratio != 1:
-                targets = cv.detect_grey_blocks(img, 6000)
-            else:
-                targets = cv.detect_grey_blocks(img)
-            pos = (waiting_x[int(self.name) - 1] + adb_helper.base_width / 2, waiting_y)
+            targets = image_cv.detect_grey_blocks(img, 6000)
+            pos = (waiting_x[int(self.name) - 1] + adaptor.base_width / 2, waiting_y)
             # log.debug("detect_grey_blocks {}, targets: {}".format(pos, targets))
             for t in targets:
                 if math.dist(t, pos) < 100:
@@ -1264,7 +1262,7 @@ class Unit:
         if not self.placement_img:
             log.error("{} 判断部署状态找不到图片".format(self.name))
             return PlacementState.NotWaiting, None
-        pos = script_helper.find_pic_max_pos(img, self.placement_img, return_center=True, accuracy=0.6)
+        pos = adaptor.find_pic_max_pos(img, self.placement_img, return_center=True, accuracy=0.6)
         if pos:
             log.debug("{} 判断部署pos为{}".format(self.name, pos))
         if not pos:

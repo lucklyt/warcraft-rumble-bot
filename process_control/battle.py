@@ -4,6 +4,7 @@ import os
 
 from PIL import Image
 
+from adaptor import adaptor
 from conf.conf import log
 import math
 import random
@@ -12,10 +13,9 @@ from operator import attrgetter
 
 import detect.image_cv
 from conf import conf
-from emulator import warcraft, units
-from adaptor import emulator
+import warcraft, units
 from process_control import energy
-from emulator.units import Unit, PlacementState, Trait
+from units import Unit, PlacementState, Trait
 
 kobold = Unit.get_by_name("狗头人矿工")
 
@@ -28,9 +28,9 @@ base_defense_y = 1200
 def init_placement_pos(mode="pve"):
     global placement_pos_list, unit_target_pos
     # 默认部署位置为基地左右
-    placement_pos_list = [(adb_helper.base_width / 2 - 240, base_defense_y),
-                          (adb_helper.base_width / 2, base_defense_y - 250),
-                          (adb_helper.base_width / 2 + 240, base_defense_y)]
+    placement_pos_list = [(adaptor.base_width / 2 - 240, base_defense_y),
+                          (adaptor.base_width / 2, base_defense_y - 250),
+                          (adaptor.base_width / 2 + 240, base_defense_y)]
     unit_target_pos = dict()
     for target in conf.get_placement_pos(mode):
         if target.get('name'):
@@ -147,7 +147,7 @@ def move_unit_to_head(orders, unit):
 
 
 def valid_play_pos(pos):
-    if adb_helper.base_width / 2 - 520 < pos[0] < adb_helper.base_width / 2 + 520 and pos[1] < 188:
+    if adaptor.base_width / 2 - 520 < pos[0] < adaptor.base_width / 2 + 520 and pos[1] < 188:
         return False
     if pos[1] > 1555:
         return False
@@ -159,11 +159,11 @@ enemy_pos_map = dict()
 
 def get_enemy_pos():
     targets = detect.cv.detect_enemy_tag(warcraft.source)
-    sorted_targets = sorted(targets, key=lambda pos: math.dist(pos, (adb_helper.base_width / 2, base_defense_y)))
+    sorted_targets = sorted(targets, key=lambda pos: math.dist(pos, (adaptor.base_width / 2, base_defense_y)))
     for target in sorted_targets:
         enemy_pos_map[target] = enemy_pos_map.get(target, 0) + 1
         if valid_play_pos(target) and enemy_pos_map[target] < 8:
-            log.info("发现em可能位置 {}".format(adb_helper.base_target(target)))
+            log.info("发现em可能位置 {}".format(adaptor.base_position(target)))
             return target
     return None
 
@@ -173,12 +173,12 @@ def get_defensive_pos():
     targets = [target for target in targets if valid_play_pos(target)]
     targets.sort(key=lambda pos: pos[1])
     if len(targets) > 0:
-        log.info("检测ds位置 {}".format([adb_helper.base_target(target) for target in targets]))
+        log.info("检测ds位置 {}".format([adaptor.base_position(target) for target in targets]))
     result = []
     for target in targets:
         if target[0] - 150 > 0:
             result.append((target[0] - 150, target[1]))
-        if target[0] + 150 < adb_helper.base_width:
+        if target[0] + 150 < adaptor.base_width:
             result.append((target[0] + 150, target[1]))
     return result
 
@@ -222,7 +222,7 @@ img_gold_full = Image.open(os.path.join(conf.static_path, "img/gold_full.png"))
 
 
 def get_kobold_placement_pos():
-    gold_pos = script_helper.find_pic_max_pos(warcraft.source, img_gold_full)
+    gold_pos = adaptor.find_pic_max_pos(warcraft.source, img_gold_full)
     if not gold_pos:
         return placement_pos_list[cur_placement_index % len(placement_pos_list)]
     defensive_pos = get_defensive_pos() + placement_pos_list
@@ -295,11 +295,11 @@ def placement_unit():
             state, pos = u.placement_state(warcraft.source, ec)
             if state == PlacementState.Ready:
                 target_pos = get_placement_pos(u)
-                log.info("单位 %s 能量已满，部署位置：%s->%s", u.name, adb_helper.base_target(pos),
-                         adb_helper.base_target(target_pos))
+                log.info("单位 %s 能量已满，部署位置：%s->%s", u.name, adaptor.base_position(pos),
+                         adaptor.base_position(target_pos))
                 cur_placement_index = cur_placement_index + 1
                 last_placement_unit = u
-                script_helper.slide((pos, target_pos))
+                adaptor.slide((pos, target_pos))
                 break
             elif state == PlacementState.NotReady:
                 waiting_unit.append(u.name)
@@ -315,7 +315,7 @@ def placement_unit():
         if kobold_state == PlacementState.Ready:
             target_pos = get_kobold_placement_pos()
             log.info("部署狗头人矿工，%s->%s", pos, target_pos)
-            script_helper.slide((pos, target_pos))
+            adaptor.slide((pos, target_pos))
     if state == PlacementState.NotWaiting and len(waiting_unit) == 0:
         if ec > 3:
             log.error("当前能量值[{}],错误没有找到任何单位！！".format(ec))
@@ -324,13 +324,13 @@ def placement_unit():
                 random_placement()
     log.debug("当前能量值[{}],部署单位处理完成，耗时 {:.2f}s".format(ec, time.time() - start_time))
     if conf.get_anonymous_team():
-        script_helper.delay(0.5)
+        adaptor.delay(0.5)
     return int(state == PlacementState.Ready) + len(waiting_unit)
 
 
 def fish_time():
     log.info("鱼人时间开始！！！")
-    script_helper.delay(1.5)
+    adaptor.delay(1.5)
     st = time.time()
     order = []
     for unit in warcraft.line_up_units:
@@ -364,7 +364,7 @@ def fish_time():
         if next_unit and ec >= next_unit.placement_cost:
             target_pos = get_placement_pos(next_unit)
             log.info("单位 %s 能量已满，去上场,位置：%s->%s", next_unit.name, next_pos, target_pos)
-            script_helper.slide((next_pos, target_pos))
+            adaptor.slide((next_pos, target_pos))
             # ec = ec - (next_unit.placement_cost + k)
             k = k + 1
             if next_unit.name != "迅猛龙" or k >= 3:
@@ -373,13 +373,13 @@ def fish_time():
 
 
 def random_placement():
-    cards_pos = [(adb_helper.base_width / 2 + units.waiting_x[0], 1678),
-                 (adb_helper.base_width / 2 + units.waiting_x[1], 1678),
-                 (adb_helper.base_width / 2 + units.waiting_x[2], 1678),
-                 (adb_helper.base_width / 2 + units.waiting_x[3], 1678)]
+    cards_pos = [(adaptor.base_width / 2 + units.waiting_x[0], 1678),
+                 (adaptor.base_width / 2 + units.waiting_x[1], 1678),
+                 (adaptor.base_width / 2 + units.waiting_x[2], 1678),
+                 (adaptor.base_width / 2 + units.waiting_x[3], 1678)]
     random.shuffle(cards_pos)
     for card in cards_pos:
-        script_helper.slide((card, placement_pos_list[random.randrange(0, len(placement_pos_list))]))
+        adaptor.slide((card, placement_pos_list[random.randrange(0, len(placement_pos_list))]))
 
 
 def map_init(mode):
@@ -397,13 +397,13 @@ def map_init(mode):
     #             log.error("slide cmd error {}".format(cmd))
     #             continue
     #         log.info("地图初始化 slide (%d,%d) -> (%d,%d)", int(r[0]), int(r[1]), int(r[2]), int(r[3]))
-    #         script_helper.slide(((int(r[0]), int(r[1])), (int(r[2]), int(r[3]))))
+    #         adaptor.slide(((int(r[0]), int(r[1])), (int(r[2]), int(r[3]))))
     #     elif cmd.startswith("touch"):
     #         r = parse.parse("touch ({},{})", cmd)
     #         if not r or len(r.fixed) != 2:
     #             log.error("touch cmd error {}".format(cmd))
     #             continue
     #         log.info("地图初始化 touch (%d,%d)", int(r[0]), int(r[1]))
-    #         script_helper.touch((int(r[0]), int(r[1])))
+    #         adaptor.touch((int(r[0]), int(r[1])))
     #     else:
     #         log.error("not support cmd {}".format(cmd))

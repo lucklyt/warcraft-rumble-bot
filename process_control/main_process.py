@@ -6,9 +6,9 @@ from enum import Enum
 
 from conf import conf
 from conf.conf import log
-from emulator import battle
-from adaptor import adaptor as gamer
-from emulator import warcraft
+import battle
+from adaptor import adaptor
+import warcraft
 
 last_battle_time = time.time()
 enter_battle = False
@@ -122,7 +122,7 @@ def battle_flow():
                 if warcraft.session_error():
                     break
                 if warcraft.continue_battle():
-                    gamer.delay(0.2)
+                    adaptor.delay(0.2)
                     continue
                 if warcraft.is_battle_over():
                     if enter_battle and time.time() - st < 30:
@@ -133,11 +133,11 @@ def battle_flow():
             if not started:
                 if warcraft.is_loading():
                     log.debug("加载中")
-                    gamer.delay(0.1)
+                    adaptor.delay(0.1)
                     continue
                 if warcraft.is_cut_scenes():
                     log.debug("战斗动画播放中")
-                    gamer.delay(0.1)
+                    adaptor.delay(0.1)
                     continue
             if not started or time.time() - last_battle_time > 5:
                 log.debug("not started and > 5s  since last battle")
@@ -200,7 +200,7 @@ def check_other():
         if warcraft.do_take_exp_award():
             return
         if conf.get_auto_delete_cache():
-            gamer.delete_expired_files()
+            adaptor.delete_expired_files()
         if warcraft.total % 40 != 0:
             slept = False
         if not slept and warcraft.total != 0 and warcraft.total % 40 == 0:

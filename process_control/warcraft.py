@@ -401,7 +401,7 @@ def refresh_task():
     global exp_0_cnt
     if not conf.is_refresh_task():
         return
-    now = adb_helper.get_datetime()
+    now = adaptor.get_datetime()
     if exp_0_cnt < 2 and (not now or now.minute < 50 or now.hour == 23):
         return
     log.info("模拟器当前时间 {}, 获取经验为0次数 {}".format(now, exp_0_cnt))

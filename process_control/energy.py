@@ -8,7 +8,7 @@ import os
 from conf import conf
 import numpy as np
 
-from adaptor import emulator
+from adaptor import emulator, adaptor
 
 nds = []
 
@@ -51,7 +51,7 @@ def similar(a, b):
 
 def recognize(source):
     st = time.time()
-    nd = get_nd(crop_ec(source, adb_helper.base_width))
+    nd = get_nd(crop_ec(source, adaptor.base_width))
     max_simi = 0
     max_x = 0
     for x in range(len(nds)):
@@ -59,9 +59,7 @@ def recognize(source):
         if simi > max_simi:
             max_simi = simi
             max_x = x
-        threshold = 0.99
-        if adb_helper.ratio != 1.0:
-            threshold = 0.8
+        threshold = 0.8
         if simi >= threshold:
             log.debug("energy recognize {} latency {}".format(x, time.time() - st))
             return x
