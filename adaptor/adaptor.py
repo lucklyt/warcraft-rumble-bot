@@ -1,7 +1,6 @@
 # cython: language_level=3
 import os
 import random
-import re
 import time
 from datetime import datetime
 from functools import lru_cache
@@ -13,8 +12,29 @@ from PIL import Image
 from cnocr import CnOcr
 
 from conf import conf
-from emulator import adb_helper
 from conf.conf import log
+
+target_size = (1080, 1920)
+ratio = 1.0
+
+base_height = 1920
+base_width = 1080
+
+
+def match_screen_size(size):
+    global base_width
+    global target_size, ratio
+    target_size = size
+    ratio = target_size[1] / base_height
+    base_width = int(target_size[0] / ratio)
+
+
+def base_coordinate(pos):
+    return int(pos * ratio)
+
+
+def base_position(target):
+    return base_coordinate(target[0]), base_coordinate(target[1])
 
 
 def delay(t):
@@ -43,9 +63,9 @@ def touch(pos):
     _pos = random_pos(pos)
     log.debug("touch ({},{}), delay {}".format(_pos[0], _pos[1], rand_time))
     if rand_time < 10:
-        adb_helper.touch(_pos)
+        adb_helper.touch(base_position(_pos))
     else:
-        adb_helper.long_touch(_pos, rand_time)
+        adb_helper.long_touch(base_position(_pos), rand_time)
 
 
 slide_duration = conf.get_slide_duration()
@@ -57,7 +77,7 @@ def slide(vector):
     _startPos = random_pos(start_pos)
     _stopPos = random_pos(stop_pos)
     rand_time = random.randint(slide_duration[0], slide_duration[1])
-    adb_helper.slide(_startPos, _stopPos, rand_time)
+    adb_helper.slide(base_position(_startPos), base_position(_stopPos), rand_time)
 
 
 # 截屏，识图，返回坐标
@@ -187,7 +207,11 @@ def screen_picture():
     image = os.path.join(conf.cache_dir, capture_file_name)
     if os.path.isfile(image):
         os.remove(image)
-    return adb_helper.screen_capture(image)
+    img = adb_helper.screen_capture(image)
+    if img:
+        match_screen_size(img.size())
+        img = img.resize((base_width, base_height))
+    return img
 
 
 # 从source图片中查找wanted图片所在的位置，当置信度大于accuracy时返回找到的最大置信度位置的左上角坐标

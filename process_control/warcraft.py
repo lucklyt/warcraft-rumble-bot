@@ -4,7 +4,6 @@ import re
 
 from conf.conf import log
 import os.path
-import random
 import time
 from datetime import datetime
 
@@ -12,8 +11,8 @@ import pytz
 from PIL import Image
 
 import conf.conf as conf
-from emulator import adb_helper, units
-from emulator import script_helper as gamer
+from emulator import units
+from adaptor import adaptor as gamer, emulator
 from emulator.units import Unit
 from mail import mail
 

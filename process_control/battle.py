@@ -1,6 +1,5 @@
 # cython: language_level=3
 import copy
-import logging
 import os
 
 from PIL import Image
@@ -11,11 +10,11 @@ import random
 import time
 from operator import attrgetter
 
-import parse
-
 import detect.image_cv
 from conf import conf
-from emulator import warcraft, script_helper, energy, adb_helper, units
+from emulator import warcraft, units
+from adaptor import emulator
+from process_control import energy
 from emulator.units import Unit, PlacementState, Trait
 
 kobold = Unit.get_by_name("狗头人矿工")

@@ -8,8 +8,7 @@ from enum import Enum
 from PIL import Image
 
 from conf import conf
-from detect import image_cv
-from emulator import script_helper, adb_helper
+from adaptor import emulator
 
 unis_json = """
 

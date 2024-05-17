@@ -12,38 +12,7 @@ from adb_shell.adb_device import AdbDeviceTcp
 from adb_shell.auth.sign_pythonrsa import PythonRSASigner
 from conf import conf
 
-adb_path = os.path.join(conf.application_path, "platform-tools")
-os.environ["PATH"] += os.pathsep + adb_path
-device_id = "localhost:" + str(conf.adb_port())
-
-target_size = (1080, 1920)
-ratio = 1.0
-
-base_height = 1920
-base_width = 1080
-device = AdbDeviceTcp('localhost', 5555, default_transport_timeout_s=10.)
-
-
-def init():
-    connect()
-
-
-def screen_size():
-    global base_width
-    r = device.shell("wm size", timeout_s=10, decode=True)
-    ss = r.split()
-    if len(ss) == 0:
-        log.error("获取模拟器分辨率失败！{}".format(r))
-        return
-    ss = ss[len(ss) - 1].split("x")
-    if len(ss) != 2:
-        log.error("获取模拟器分辨率失败！{}".format(ss))
-        return
-    global target_size, ratio
-    target_size = (int(ss[0]), int(ss[1]))
-    ratio = target_size[1] / base_height
-    base_width = int(target_size[0] / ratio)
-    log.info("模拟器分辨率为{}，转换比例为{:.2f},转换后为{}".format(target_size, ratio, (base_width, base_height)))
+device = None
 
 
 def connect():
@@ -55,15 +24,16 @@ def connect():
         with open(conf.public_key) as f:
             public_key = f.read()
         signer = PythonRSASigner(public_key, private_key)
-        if device.connect(rsa_keys=[signer], auth_timeout_s=3):
-            screen_size()
-        else:
+        if not device.connect(rsa_keys=[signer], auth_timeout_s=3):
             log.error("connect failed")
     except ConnectionRefusedError as e:
         log.error("connect refused")
     finally:
         if not device.available:
             log.error("connect failed")
+
+
+connect()
 
 
 def is_app_running():
@@ -87,7 +57,8 @@ def start_play_game():
     device.shell("am start -n com.google.android.play.games/com.google.android.gms.games.ui.destination."
                  "main.MainActivity", decode=True, timeout_s=10)
     time.sleep(1)
-    device.shell("am start -n com.android.vending/com.google.android.finsky.activities.MainActivity", decode=True, timeout_s=10)
+    device.shell("am start -n com.android.vending/com.google.android.finsky.activities.MainActivity", decode=True,
+                 timeout_s=10)
 
 
 def stop_app():
@@ -127,10 +98,7 @@ def screen_capture(cap_path):
         device.shell("screencap  sdcard/adb_screenCap.png", decode=True, timeout_s=10)
         device.pull("sdcard/adb_screenCap.png", cap_path)
         if os.path.exists(cap_path):
-            img = Image.open(cap_path)
-            if ratio != 1.0:
-                img = img.resize((base_width, base_height))
-            return img
+            return Image.open(cap_path)
         else:
             log.error(
                 "图片保存失败，请确定路径 {} 存在，并尝试将文件夹放到硬盘根目录，去掉文件夹路经中的数字空格等符号".format(
@@ -147,22 +115,20 @@ def screen_capture(cap_path):
 # 模拟点击屏幕，参数pos为目标坐标(x, y)
 def touch(pos):
     device.shell("input touchscreen tap {0} {1}".format(
-        base_pos(pos[0]), base_pos(pos[1])), decode=True, timeout_s=10)
+        pos[0], pos[1]), decode=True, timeout_s=10)
 
 
 # 模拟滑动屏幕，posStart为起始坐标(x, y)，posStop为终点坐标(x, y)，time为滑动时间
 def slide(start_pos, end_pos, duration):
     device.shell("input draganddrop {0} {1} {2} {3} {4}".
-                 format(base_pos(start_pos[0]), base_pos(start_pos[1]),
-                        base_pos(end_pos[0]), base_pos(end_pos[1]), duration), decode=True, timeout_s=10)
+                 format(start_pos[0], start_pos[1],
+                        end_pos[0], end_pos[1], duration), decode=True, timeout_s=10)
 
 
 # 模拟长按屏幕，参数pos为目标坐标(x, y)，time为长按时间
 def long_touch(pos, duration):
     device.shell("input swipe {0} {1} {2} {3} {4}".format(
-        base_pos(pos[0]), base_pos(pos[1]),
-        base_pos(pos[0]), base_pos(pos[1]), duration), decode=True,
-        timeout_s=10)
+        pos[0], pos[1], pos[0], pos[1], duration), decode=True, timeout_s=10)
 
 
 def set_timezone(timezone):
@@ -181,11 +147,3 @@ def get_datetime():
 
 def back():
     device.shell("input keyevent KEYCODE_BACK", timeout_s=10)
-
-
-def base_pos(pos):
-    return int(pos * ratio)
-
-
-def base_target(target):
-    return base_pos(target[0]), base_pos(target[1])

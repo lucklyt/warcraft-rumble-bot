@@ -6,7 +6,8 @@ from enum import Enum
 
 from conf import conf
 from conf.conf import log
-from emulator import script_helper as gamer, battle
+from emulator import battle
+from adaptor import adaptor as gamer
 from emulator import warcraft
 
 last_battle_time = time.time()

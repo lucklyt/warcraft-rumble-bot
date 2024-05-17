@@ -55,7 +55,7 @@ ui提供图形化的用户操作界面，可以修改配置并启动或关闭程
 * [pyyaml](https://github.com/yaml/pyyaml) Python读写yaml配置文件。
 
 ## 使用方法
-### 从源码编译
+### 编译构建
 需要安装Python3.12,运行ps脚本构建GUI应用。
 #### windows
 构建windows应用程序依赖MSVC工具集，提前[下载](https://visualstudio.microsoft.com/zh-hans/visual-cpp-build-tools/)安装。
@@ -76,3 +76,5 @@ pip install -r requirements.darwin.txt
 pwsh ./py_to_exe.ps1
 ```
 编译好的应用dmg安装包在当前目录下的warcraft_rumble_bot 0.0.0.dmg，打开拖动App图标到应用程序即可。
+
+### 配置说明

@@ -8,7 +8,7 @@ import os
 from conf import conf
 import numpy as np
 
-from emulator import adb_helper
+from adaptor import emulator
 
 nds = []
 
