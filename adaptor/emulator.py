@@ -12,7 +12,7 @@ from adb_shell.adb_device import AdbDeviceTcp
 from adb_shell.auth.sign_pythonrsa import PythonRSASigner
 from conf import conf
 
-device = None
+device = AdbDeviceTcp(NotImplemented)
 
 
 def connect():
@@ -61,7 +61,7 @@ def start_play_game():
                  timeout_s=10)
 
 
-def stop_app():
+def close_app():
     device.shell("am force-stop " + conf.get_app_package(), decode=True, timeout_s=10)
 
 

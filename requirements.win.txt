@@ -11,3 +11,4 @@ pywin32
 pywebview
 onnxruntime
 parse
+pyautogui

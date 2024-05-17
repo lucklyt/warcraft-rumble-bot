@@ -49,6 +49,16 @@ pve_data = data.get("pve", {})
 notify = data.get("notify", {})
 
 
+def get_platform():
+    return data.get("platform", "pc")
+
+
+def set_platform(platform):
+    data["platform"] = platform
+    save_file()
+    log.debug("set platform %s", platform)
+
+
 def adb_port():
     return data.get("adb", {}).get("port", 0)
 

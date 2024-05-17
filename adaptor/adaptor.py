@@ -13,6 +13,8 @@ from cnocr import CnOcr
 
 from conf import conf
 from conf.conf import log
+from . import emulator
+from . import pc
 
 target_size = (1080, 1920)
 ratio = 1.0
@@ -21,12 +23,15 @@ base_height = 1920
 base_width = 1080
 
 
-def match_screen_size(size):
+def match_screen_size(img):
+    if not img:
+        return None
     global base_width
     global target_size, ratio
-    target_size = size
+    target_size = img.size()
     ratio = target_size[1] / base_height
     base_width = int(target_size[0] / ratio)
+    return img.resize((base_width, base_height))
 
 
 def base_coordinate(pos):
@@ -59,13 +64,12 @@ _touch_delay = conf.get_touch_delay()
 
 
 def touch(pos):
-    rand_time = random.randint(0, _touch_delay)
-    _pos = random_pos(pos)
-    log.debug("touch ({},{}), delay {}".format(_pos[0], _pos[1], rand_time))
-    if rand_time < 10:
-        adb_helper.touch(base_position(_pos))
+    _pos = base_position(random_pos(pos))
+    log.debug("touch ({},{})".format(_pos[0], _pos[1]))
+    if conf.get_platform() == "pc":
+        pc.touch(_pos)
     else:
-        adb_helper.long_touch(base_position(_pos), rand_time)
+        emulator.touch(_pos)
 
 
 slide_duration = conf.get_slide_duration()
@@ -74,11 +78,46 @@ slide_duration = conf.get_slide_duration()
 # 智能模拟滑屏，给定起始点和终点的二元组，模拟一次随机智能滑屏
 def slide(vector):
     start_pos, stop_pos = vector
-    _startPos = random_pos(start_pos)
-    _stopPos = random_pos(stop_pos)
+    _startPos = base_position(random_pos(start_pos))
+    _stopPos = base_position(random_pos(stop_pos))
     rand_time = random.randint(slide_duration[0], slide_duration[1])
-    adb_helper.slide(base_position(_startPos), base_position(_stopPos), rand_time)
+    if conf.get_platform() == "pc":
+        pc.drag(_startPos, _stopPos, rand_time / 1000.0)
+    else:
+        emulator.slide(_startPos, _stopPos, rand_time)
 
+
+def start_app():
+    if conf.get_platform() == "emulator":
+        emulator.start_app()
+
+
+def is_app_running():
+    if conf.get_platform() == "emulator":
+        return emulator.is_app_running()
+    return True
+
+
+def close_app():
+    if conf.get_platform() == "emulator":
+        emulator.close_app()
+
+
+def set_timezone(zone):
+    if conf.get_platform() == "emulator":
+        emulator.set_timezone(zone)
+
+
+def get_datetime():
+    if conf.get_platform() == "emulator":
+        return emulator.get_datetime()
+    else:
+        return datetime.now()
+
+
+def clean():
+    if conf.get_platform() == "emulator":
+        emulator.clean()
 
 # 截屏，识图，返回坐标
 def find_pic_max_pos(source: Image.Image, target: Image.Image, return_center=False, accuracy=conf.get_cv_threshold()):
@@ -207,11 +246,11 @@ def screen_picture():
     image = os.path.join(conf.cache_dir, capture_file_name)
     if os.path.isfile(image):
         os.remove(image)
-    img = adb_helper.screen_capture(image)
-    if img:
-        match_screen_size(img.size())
-        img = img.resize((base_width, base_height))
-    return img
+    if conf.get_platform() == "pc":
+        img = pc.screen_capture(image)
+    else:
+        img = emulator.screen_capture(image)
+    return match_screen_size(img)
 
 
 # 从source图片中查找wanted图片所在的位置，当置信度大于accuracy时返回找到的最大置信度位置的左上角坐标
