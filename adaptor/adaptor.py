@@ -28,6 +28,8 @@ def match_screen_size(img: Image.Image):
         return None
     global base_width
     global target_size, ratio
+    if img.size != target_size:
+        log.info("更新屏幕分辨率为 {}".format(img.size))
     target_size = img.size
     ratio = target_size[1] / base_height
     base_width = int(target_size[0] / ratio)

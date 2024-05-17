@@ -10,4 +10,7 @@ def drag(start, end, duration=0):
 
 
 def screen_capture(image):
-    return pyautogui.screenshot(image)
+    img = pyautogui.screenshot()
+    if img:
+        img.save(image)
+    return img
